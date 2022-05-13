@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package example.kalixfsm.domain;
+
+import "example/kalixfsm/shoppingcart.proto";
+
+option java_outer_classname = "ShoppingCartDomain";
+
+message NotCreated {}
+
+message Active {
+  example.kalixfsm.Cart cart = 1;
+}
+
+message CheckedOut {
+  example.kalixfsm.Cart cart = 1;
+  string confirmation_id = 2;
+}
+
+message Deleted {}
+
+message CartCreated {
+  int64 timestamp = 1;
+}
+
+message ItemAdded {
+  example.kalixfsm.LineItem item = 1;
+}
+
+message ItemRemoved {
+  string product_id = 1;
+}
+
+message CartCheckedOut {
+  string confirmation_id = 1;
+}
+
+message CartDeleted {}

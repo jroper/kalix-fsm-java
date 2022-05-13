@@ -1,0 +1,89 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+package example.kalixfsm;
+
+import "google/protobuf/empty.proto";
+import "kalix/annotations.proto";
+import "google/api/annotations.proto";
+
+message CreateCart {
+}
+
+message CartCreated {
+  string cart_id = 1;
+}
+
+message AddLineItem {
+  string cart_id = 1 [(kalix.field).entity_key = true];
+  string product_id = 2;
+  string name = 3;
+  int32 quantity = 4;
+}
+
+message RemoveLineItem {
+  string cart_id = 1 [(kalix.field).entity_key = true];
+  string product_id = 2;
+}
+
+message GetShoppingCart {
+  string cart_id = 1 [(kalix.field).entity_key = true];
+}
+
+message RemoveShoppingCart {
+  string cart_id = 1 [(kalix.field).entity_key = true];
+}
+
+message LineItem {
+  string product_id = 1;
+  string name = 2;
+  int32 quantity = 3;
+}
+
+message Cart {
+  repeated LineItem items = 1;
+  int64 creation_timestamp = 2;
+}
+
+message CheckoutCart {
+  string cart_id = 1 [(kalix.field).entity_key = true];
+  // payment details etc
+}
+
+message CheckoutConfirmation {
+  string confirmation_id = 1;
+}
+
+service ShoppingCartService {
+  rpc Create (CreateCart) returns (CartCreated) {
+    option (kalix.method).entity.key_generator = VERSION_4_UUID;
+  };
+  rpc AddItem (AddLineItem) returns (google.protobuf.Empty);
+  rpc RemoveItem (RemoveLineItem) returns (google.protobuf.Empty);
+  rpc GetCart (GetShoppingCart) returns (Cart);
+  rpc Checkout (CheckoutCart) returns (CheckoutConfirmation);
+  rpc RemoveCart (RemoveShoppingCart) returns (google.protobuf.Empty);
+}
+
+message States {
+  repeated State states = 1;
+  string initial_state = 2;
+}
+
+message State {
+  string name = 1;
+  repeated string commands = 2;
+  repeated Transition transitions = 3;
+}
+
+message Transition {
+  string event = 1;
+  repeated string states = 2;
+}
+
+service ShoppingCartMeta {
+  option (kalix.codegen) = {
+    action: {}
+  };
+  rpc GetStates(google.protobuf.Empty) returns (States);
+}
